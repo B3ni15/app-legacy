@@ -24,17 +24,23 @@ class ShareProvider extends ChangeNotifier {
   Future<(SharedTheme?, int)> shareCurrentTheme(
     BuildContext context, {
     bool isPublic = false,
-    bool shareNick = true,
+    bool shareNick = false,
     required SharedGradeColors gradeColors,
     String displayName = '',
   }) async {
     final SettingsProvider settings =
         Provider.of<SettingsProvider>(context, listen: false);
 
+    String? nickname = _user.nickname;
+
+    if (_user.nickname == _user.name || _user.nickname == '') {
+      nickname = 'Anonymous';
+    }
+
     Map themeJson = {
       'public_id': const Uuid().v4(),
       'is_public': isPublic,
-      'nickname': shareNick ? _user.nickname : 'Anonymous',
+      'nickname': shareNick ? nickname : 'Anonymous',
       'display_name': displayName,
       'background_color': (settings.customBackgroundColor ??
               SettingsProvider.defaultSettings().customBackgroundColor)
@@ -106,9 +112,7 @@ class ShareProvider extends ChangeNotifier {
 Future<List<SharedTheme>> getAllPublicThemes(BuildContext context,
     {int offset = 0, int limit = 10}) async {
   // Fetch all themes only once if not already fetched
-  if (_cachedThemesJson == null) {
-    _cachedThemesJson = await FilcAPI.getAllSharedThemes(0);
-  }
+  _cachedThemesJson ??= await FilcAPI.getAllSharedThemes(0);
 
   List<SharedTheme> themes = [];
 
@@ -168,7 +172,7 @@ Future<List<SharedTheme>> getAllPublicThemes(BuildContext context,
     Map gradeColorsJson = {
       'public_id': const Uuid().v4(),
       'is_public': isPublic,
-      'nickname': shareNick ? _user.nickname : 'Anonymous',
+      'nickname': 'Anonymous',
       'five_color': settings.gradeColors[4].value,
       'four_color': settings.gradeColors[3].value,
       'three_color': settings.gradeColors[2].value,

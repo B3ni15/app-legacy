@@ -1,3 +1,21 @@
+/*
+    Firka legacy (formely "refilc"), the unofficial client for e-Kréta
+    Copyright (C) 2025  Firka team (QwIT development)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 // import 'dart:async';
 
 import 'dart:io' show Platform;
@@ -51,10 +69,10 @@ class LoginScreenState extends State<LoginScreen> {
     super.initState();
     showBack = widget.back;
 
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Colors.white,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: AppColors.of(context).loginBackground,
       systemNavigationBarIconBrightness: Brightness.dark,
     ));
 
@@ -90,12 +108,12 @@ class LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(color: Color(0xFFDAE4F7)),
+        decoration: BoxDecoration(color: AppColors.of(context).loginBackground),
         child: SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
           controller: _scrollController,
           child: Container(
-            decoration: const BoxDecoration(color: Color(0xFFDAE4F7)),
+            decoration: BoxDecoration(color: AppColors.of(context).loginBackground),
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: SafeArea(
@@ -111,10 +129,10 @@ class LoginScreenState extends State<LoginScreen> {
                             width: 30.0,
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            'reFilc',
+                          Text(
+                            'Firka',
                             style: TextStyle(
-                                color: Color(0xFF050B15),
+                                color: AppColors.of(context).loginPrimary,
                                 fontSize: 18.0,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'Montserrat'),
@@ -162,8 +180,8 @@ class LoginScreenState extends State<LoginScreen> {
                                             children: [
                                               Text(
                                                 "welcome_title_$i".i18n,
-                                                style: const TextStyle(
-                                                    color: Color(0xFF050B15),
+                                                style: TextStyle(
+                                                    color: AppColors.of(context).loginPrimary,
                                                     fontSize: 19,
                                                     fontFamily: 'Montserrat',
                                                     fontWeight: FontWeight.w700,
@@ -176,8 +194,8 @@ class LoginScreenState extends State<LoginScreen> {
                                                     right: 20),
                                                 child: Text(
                                                   "welcome_text_$i".i18n,
-                                                  style: const TextStyle(
-                                                      color: Color(0xFF050B15),
+                                                  style: TextStyle(
+                                                      color: AppColors.of(context).loginSecondary,
                                                       fontFamily: 'FigTree',
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -204,9 +222,9 @@ class LoginScreenState extends State<LoginScreen> {
                       Container(
                         height: 280,
                         width: double.infinity,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0x00DAE4F7), Color(0xFFDAE4F7)],
+                            colors: [AppColors.of(context).loginBackground.withAlpha(0), AppColors.of(context).loginBackground],
                             stops: [0, 0.12],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -247,8 +265,8 @@ class LoginScreenState extends State<LoginScreen> {
                                                   MediaQuery.of(context)
                                                       .viewInsets
                                                       .bottom,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xFFDAE4F7),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.of(context).loginBackground,
                                                 borderRadius: BorderRadius.only(
                                                   topRight:
                                                       Radius.circular(24.0),
@@ -268,9 +286,9 @@ class LoginScreenState extends State<LoginScreen> {
                                                         vertical: 18),
                                                     child: Container(
                                                       decoration:
-                                                          const BoxDecoration(
+                                                          BoxDecoration(
                                                         color:
-                                                            Color(0xFFB9C8E5),
+                                                          AppColors.of(context).loginPrimary,
                                                         borderRadius:
                                                             BorderRadius.only(
                                                           topRight:
@@ -333,9 +351,10 @@ class LoginScreenState extends State<LoginScreen> {
                                       },
                                       child: Text(
                                         "login_w_kreta_acc".i18n,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             fontFamily: 'Montserrat',
                                             fontSize: 16,
+                                            color: AppColors.of(context).loginPrimary,
                                             fontWeight: FontWeight.w700),
                                       )),
                                 ),

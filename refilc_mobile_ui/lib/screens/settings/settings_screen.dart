@@ -1,3 +1,21 @@
+/*
+    Firka legacy (formely "refilc"), the unofficial client for e-Kréta
+    Copyright (C) 2025  Firka team (QwIT development)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 // ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously, deprecated_member_use
 
 import 'dart:convert';
@@ -62,7 +80,6 @@ import 'package:provider/provider.dart';
 import 'package:shake_flutter/enums/shake_screen.dart';
 import 'package:shake_flutter/shake_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'debug/subject_icon_gallery.dart';
 import 'settings_screen.i18n.dart';
 import 'package:flutter/services.dart';
 import 'package:refilc_mobile_ui/screens/settings/user/nickname.dart';
@@ -778,33 +795,6 @@ class SettingsScreenState extends State<SettingsScreen>
                 ],
               ),
             ),
-
-            // // icon gallery (debug mode)
-            if (kDebugMode)
-              Padding(
-                padding: const EdgeInsets.only(
-                    bottom: 16.0, left: 24.0, right: 24.0),
-                child: Panel(
-                  title: const Text("Debug"),
-                  child: Column(
-                    children: [
-                      PanelButton(
-                        title: const Text("Subject Icon Gallery"),
-                        leading:
-                            const Icon(CupertinoIcons.rectangle_3_offgrid_fill),
-                        trailing: const Icon(Icons.arrow_forward),
-                        onPressed: () {
-                          Navigator.of(context, rootNavigator: true).push(
-                            CupertinoPageRoute(
-                                builder: (context) =>
-                                    const SubjectIconGallery()),
-                          );
-                        },
-                      )
-                    ],
-                  ),
-                ),
-              ),
 
             // other secion
             SplittedPanel(

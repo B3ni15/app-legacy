@@ -1,3 +1,21 @@
+/*
+    Firka legacy (formely "refilc"), the unofficial client for e-Kréta
+    Copyright (C) 2025  Firka team (QwIT development)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 // ignore_for_file: no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'dart:convert';
@@ -71,7 +89,32 @@ class NotesPageState extends State<NotesPage> with TickerProviderStateMixin {
   final TextEditingController _taskName = TextEditingController();
   final TextEditingController _taskContent = TextEditingController();
 
-  void generateTiles() async {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      generateTiles();
+    });
+  }
+
+Future<void> deleteTodoItem(TodoItem item) async {
+  todoItems.removeWhere((element) => element.id == item.id);
+  await databaseProvider.userStore.storeSelfTodoItems(todoItems, userId: user.id!);
+
+  Provider.of<SelfNoteProvider>(context, listen: false).restore();
+  Provider.of<SelfNoteProvider>(context, listen: false).restoreTodo();
+
+  setState(() {});
+}
+
+  Future<void> generateTiles() async {
+    if (!mounted) return;
+
+    user = Provider.of<UserProvider>(context, listen: false);
+    databaseProvider = Provider.of<DatabaseProvider>(context, listen: false);
+    updateProvider = Provider.of<UpdateProvider>(context, listen: false);
+    selfNoteProvider = Provider.of<SelfNoteProvider>(context, listen: false);
+
     doneItems = await databaseProvider.userQuery.toDoItems(userId: user.id!);
     todoItems = await databaseProvider.userQuery.getTodoItems(userId: user.id!);
 
@@ -80,14 +123,10 @@ class NotesPageState extends State<NotesPage> with TickerProviderStateMixin {
     List<Homework> hw = Provider.of<HomeworkProvider>(context, listen: false)
         .homework
         .where((e) => e.deadline.isAfter(DateTime.now()))
-        // e.deadline.isBefore(DateTime(DateTime.now().year,
-        //     DateTime.now().month, DateTime.now().day + 3)))
         .toList();
 
-    // todo tiles
     List<Widget> toDoTiles = [];
 
-    // TODO: FIX THIS ASAP
     if (hw.isNotEmpty &&
         Provider.of<PlusProvider>(context, listen: false)
             .hasScope(PremiumScopes.unlimitedSelfNotes)) {
@@ -98,51 +137,39 @@ class NotesPageState extends State<NotesPage> with TickerProviderStateMixin {
                 '${(e.subject.isRenamed ? e.subject.renamedTo : e.subject.name) ?? ''}, ${e.content.escapeHtml()}',
             isTicked: doneItems[e.id] ?? false,
             onTap: (p0) async {
-              // print(p0);
-              // print(doneItems);
-              if (!doneItems.containsKey(e.id)) {
-                doneItems.addAll({e.id: p0});
-              } else {
-                doneItems[e.id] = p0;
-              }
-              // print(doneItems);
-              // print(doneItems[e.id]);
-              // print(user.id);
+              doneItems[e.id] = p0;
               await databaseProvider.userStore
                   .storeToDoItem(doneItems, userId: user.id!);
-
               setState(() {});
-
-              // print(
-              //     await databaseProvider.userQuery.toDoItems(userId: user.id!));
             },
           )));
     }
 
-    if (selfNoteProvider.todos.isNotEmpty) {
-      toDoTiles.addAll(selfNoteProvider.todos.map((e) => TickTile(
-            padding: EdgeInsets.zero,
-            title: e.title,
-            description: e.content,
-            isTicked: e.done,
-            onTap: (p0) async {
-              final todoItemIndex =
-                  todoItems.indexWhere((element) => element.id == e.id);
-              if (todoItemIndex != -1) {
-                TodoItem todoItem = todoItems[todoItemIndex];
-                Map<String, dynamic> todoItemJson = todoItem.toJson;
-                todoItemJson['done'] = p0;
-                todoItem = TodoItem.fromJson(todoItemJson);
-                todoItems[todoItemIndex] = todoItem;
-                await databaseProvider.userStore
-                    .storeSelfTodoItems(todoItems, userId: user.id!);
-              }
-
-              // await databaseProvider.userStore
-              //     .storeSelfTodoItems(todoItems, userId: user.id!);
-            },
-          )));
-    }
+if (selfNoteProvider.todos.isNotEmpty) {
+  toDoTiles.addAll(selfNoteProvider.todos.map((e) => GestureDetector(
+        onLongPress: () async {
+          final todoItem = todoItems.firstWhere((item) => item.id == e.id);
+          await deleteTodoItem(todoItem);
+        },
+        child: TickTile(
+          padding: EdgeInsets.zero,
+          title: e.title,
+          description: e.content,
+          isTicked: e.done,
+          onTap: (p0) async {
+            final todoItemIndex = todoItems.indexWhere((element) => element.id == e.id);
+            if (todoItemIndex != -1) {
+              TodoItem todoItem = todoItems[todoItemIndex];
+              Map<String, dynamic> todoItemJson = todoItem.toJson;
+              todoItemJson['done'] = p0;
+              todoItem = TodoItem.fromJson(todoItemJson);
+              todoItems[todoItemIndex] = todoItem;
+              await databaseProvider.userStore.storeSelfTodoItems(todoItems, userId: user.id!);
+            }
+          },
+        ),
+      )));
+}
 
     if (toDoTiles.isNotEmpty) {
       tiles.add(const SizedBox(
@@ -328,9 +355,8 @@ class NotesPageState extends State<NotesPage> with TickerProviderStateMixin {
                     child: ProfileImage(
                       heroTag: "profile",
                       name: firstName,
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .tertiary, //ColorUtils.stringToColor(user.displayName ?? "?"),
+                      backgroundColor: Theme.of(context).colorScheme.tertiary,
+                      //ColorUtils.stringToColor(user.displayName ?? "?"),
                       badge: updateProvider.available,
                       role: user.role,
                       profilePictureString: user.picture,
