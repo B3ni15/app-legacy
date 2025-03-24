@@ -1,4 +1,5 @@
 import 'package:firka/helpers/api/model/generic.dart';
+// ignore: unused_import
 import 'package:firka/helpers/api/model/grade.dart';
 import 'package:firka/helpers/api/model/subject.dart';
 
