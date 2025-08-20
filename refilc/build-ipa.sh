@@ -16,4 +16,4 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-flutter build ipa --release --tree-shake-icons --split-debug-info=debug-info --obfuscate --no-codesign
+flutter build ipa --release --tree-shake-icons --split-debug-info=debug-info --obfuscate
